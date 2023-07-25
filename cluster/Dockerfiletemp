@@ -1,0 +1,51 @@
+FROM nlknguyen/alpine-mpich
+
+# # ------------------------------------------------------------
+# # Build MPI project
+# # ------------------------------------------------------------
+# Install python/pip
+ENV PYTHONUNBUFFERED=1
+RUN sudo apk add --update --no-cache python3 && sudo ln -sf python3 /usr/bin/python
+RUN sudo python3 -m ensurepip
+RUN sudo pip3 install --no-cache --upgrade pip setuptools
+RUN sudo apk add --no-cache --update \
+    bash \
+    build-base \
+    libc6-compat \
+    openmpi openmpi-dev\
+    openssh \
+    openrc \
+    nfs-utils \
+    neovim \
+    tini
+RUN sudo pip install mpi4py
+
+# Install NumPy
+RUN sudo pip install numpy
+# Put all build steps and additional package installation here
+
+# Note: the current directory is ${WORKDIR:=/project}, which is
+# also the default directory where ${USER:=mpi} will SSH login to
+
+# Copy the content of `project` directory in the host machine to 
+# the current working directory in this Docker image
+
+COPY project/ /project
+# Copy the MPI application file to the container
+
+
+
+
+# Normal build command
+# RUN mpicc -o mpi_hello_world mpi_hello_world.c
+
+# ####################
+# For Docker beginner:
+
+# After Docker syntax `RUN`, you can execute any command available in 
+# the current shell of the image.
+
+# To switch to root:    USER root
+# To switch back to default user: USER ${USER}
+WORKDIR /project
+
